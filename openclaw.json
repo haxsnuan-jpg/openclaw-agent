@@ -1,0 +1,60 @@
+{
+  // OpenClaw -> 9Router (provider OpenAI-compatible, service TERPISAH)
+  //
+  // ⚠️ Env WAJIB di Render (tanpa ini gateway GAGAL start):
+  //   NINEROUTER_URL   = URL service 9Router, mis. "https://9router-abc.onrender.com"
+  //   OPENCLAW_PUBLIC_URL = URL service OpenClaw ini, mis. "https://openclaw-abc.onrender.com"
+  agents: {
+    defaults: {
+      model: {
+        // PRIMARY: combo custom "free" (buat di dashboard 9Router)
+        // atau model Kiro. Ganti sesuai combo yang kamu buat.
+        primary: "9router/kr/claude-sonnet-4.5",
+        fallbacks: [
+          "9router/kr/glm-5",
+          "9router/kr/MiniMax-M2.5",
+          "9router/oc/<auto>"
+        ]
+      }
+    }
+  },
+  models: {
+    mode: "merge",
+    providers: {
+      "9router": {
+        // 9Router di service Render TERPISAH (akun #1). baseUrl pakai
+        // env NINEROUTER_URL supaya tidak perlu edit file tiap deploy.
+        baseUrl: "${NINEROUTER_URL}/v1",
+        // apiKey default "sk_9router" (9Router default REQUIRE_API_KEY=false,
+        // jadi key apa pun diterima). Bisa diganti lewat env kalau kamu
+        // mengaktifkan REQUIRE_API_KEY di dashboard 9Router.
+        apiKey: "sk_9router",
+        api: "openai-completions",
+        models: [
+          { id: "kr/claude-sonnet-4.5", name: "Claude via Kiro (free)" },
+          { id: "kr/glm-5", name: "GLM-5 via Kiro (free)" },
+          { id: "kr/MiniMax-M2.5", name: "MiniMax via Kiro (free)" },
+          { id: "oc/<auto>", name: "OpenCode Free" }
+        ]
+      }
+    }
+  },
+  gateway: {
+    mode: "local",
+    bind: "lan",
+    controlUi: {
+      // Origin browser yang boleh buka Control UI (wajib sejak v2026.2.26).
+      // OPENCLAW_PUBLIC_URL = URL service OpenClaw ini (env Render).
+      allowedOrigins: [
+        "${OPENCLAW_PUBLIC_URL}",
+        "http://localhost:8000",
+        "https://localhost:8000",
+        "http://127.0.0.1:8000"
+      ],
+      // Render free tidak punya shell untuk `openclaw devices approve`,
+      // jadi device pairing dimatikan. Auth tetap lewat gateway token
+      // (OPENCLAW_GATEWAY_TOKEN) yang sudah di-set.
+      dangerouslyDisableDeviceAuth: true
+    }
+  }
+}

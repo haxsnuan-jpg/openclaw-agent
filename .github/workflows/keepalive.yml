@@ -1,0 +1,19 @@
+name: keepalive
+
+on:
+  schedule:
+    # setiap 5 menit, gratis (github actions)
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cek service tetap hidup
+        run: |
+          curl -sS -o /dev/null -w "%{http_code}\n" \
+            --max-time 20 "${{ secrets.RENDER_URL }}" || true

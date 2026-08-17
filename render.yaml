@@ -1,0 +1,19 @@
+# ============================================================
+# render.yaml — PANDUAN NILAI untuk deploy SATU service di Render.
+# ⚠️ Deploy lewat dashboard manual (langkah di README).
+# ============================================================
+
+services:
+  - type: web
+    name: openclaw-agent
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /gateway/health
+    envVars:
+      - key: NINEROUTER_URL
+        sync: false # isi URL 9Router, mis. https://9router-abc.onrender.com
+      - key: OPENCLAW_PUBLIC_URL
+        sync: false # isi URL service ini, mis. https://openclaw-abc.onrender.com
+      - key: OPENCLAW_GATEWAY_TOKEN
+        sync: false # token login Control UI
